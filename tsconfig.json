@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "./built",
+    "allowJs": true,
+    "target": "es2022",
+    "module": "esnext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "strict": false,
+    "resolveJsonModule": true
+  },
+  "include": ["./lib/**/*", "./bin/**/*"]
+}
