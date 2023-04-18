@@ -1,7 +1,10 @@
 const badAddress = (addr: string) =>
   new Error(`Badly formed ip4 address: ${addr}`);
 
-export const ip4ToBits = (addr: string) => {
+export type ToBits = (addr: string) => number[];
+export type BitsTo = (bits: number[]) => string;
+
+export const ip4ToBits: ToBits = addr => {
   const parts = addr.split(".");
   if (parts.length !== 4 || !parts.every(part => /^\d+$/.test(part)))
     throw badAddress(addr);
@@ -12,7 +15,7 @@ export const ip4ToBits = (addr: string) => {
   );
 };
 
-export const bitsToIp4 = (bits: number[]) => {
+export const bitsToIp4: BitsTo = bits => {
   if (bits.length > 32 || bits.some(bit => bit < 0 || bit > 1))
     throw new Error(`Bad bit list`);
   return bits

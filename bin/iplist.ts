@@ -4,9 +4,10 @@ import {
   BitNode,
   insert,
   complement,
-  truncate,
+  prune,
   iterate,
 } from "../lib/bit-tree.js";
+
 import { bitsToIp4, ip4ToBits } from "../lib/ip4.js";
 
 const ip = [
@@ -153,16 +154,16 @@ const ip = [
   "2.26.116.1",
 ];
 
-const formatCidr = (bits: number[]): string =>
+const bitsToCidr = (bits: number[]): string =>
   `${bitsToIp4(bits)}/${bits.length}`;
 
 const showTree = (node: BitNode, maxDepth = 32): void => {
   const cidrs: { cidr: string; count: number }[] = [];
 
-  const slim = truncate(node, maxDepth);
+  const slim = prune(node, maxDepth);
 
   for (const { bits, count } of iterate(slim))
-    cidrs.push({ cidr: formatCidr(bits), count });
+    cidrs.push({ cidr: bitsToCidr(bits), count });
 
   cidrs.sort((a, b) => b.count - a.count);
 
@@ -181,7 +182,7 @@ const tree = _(ip)
 const INVERT = false;
 const TRIM = 12;
 
-const slim = truncate(tree, TRIM);
+const slim = prune(tree, TRIM);
 
 const transform = INVERT ? complement : x => x;
 

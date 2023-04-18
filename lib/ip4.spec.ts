@@ -28,6 +28,10 @@ describe("bitsToIp4", () => {
     });
   }
 
+  it(`should handle short bit strings`, () => {
+    expect(bitsToIp4([])).toBe("0.0.0.0");
+  });
+
   it(`should fail bad bit lists`, () => {
     expect(() => bitsToIp4([2])).toThrow(/bad bit/i);
   });
