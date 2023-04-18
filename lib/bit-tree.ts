@@ -6,10 +6,14 @@ interface BitSpanNode {
 
 export type BitNode = BitSpanNode | undefined;
 
-const isEmpty = (node: BitNode): boolean => !(!node || node.zero || node.one);
+export const isBitNode = (thing: unknown): thing is BitNode =>
+  thing === undefined ||
+  (thing && typeof thing === "object" && "count" in thing);
+
+const isLeaf = (node: BitNode): boolean => !(!node || node.zero || node.one);
 const isFull = (node: BitNode): boolean => !!(node && node.zero && node.one);
 const isRedundant = (node: BitNode): boolean =>
-  node && isFull(node) && isEmpty(node.zero) && isEmpty(node.one);
+  node && isFull(node) && isLeaf(node.zero) && isLeaf(node.one);
 
 const pruneNode = (node: BitNode): BitNode =>
   isRedundant(node) ? { count: node.count } : node;
@@ -32,7 +36,7 @@ const makeNode = (zero: BitNode, one: BitNode): BitNode => {
 const bitName = ["zero", "one"];
 
 export const insert = (node: BitNode, bits: number[]): BitNode => {
-  if (node && isEmpty(node)) return node;
+  if (node && isLeaf(node)) return node;
   if (!bits.length) return { count: 1 };
 
   const next: BitNode = node
@@ -53,7 +57,7 @@ export function* iterate(
   bits: number[] = []
 ): Generator<{ bits: number[]; count: number }> {
   if (!node) return;
-  if (isEmpty(node)) yield { bits, count: node.count };
+  if (isLeaf(node)) yield { bits, count: node.count };
   yield* iterate(node.zero, [...bits, 0]);
   yield* iterate(node.one, [...bits, 1]);
 }
@@ -67,7 +71,7 @@ const depthClip = (
   cond = (node: BitNode) => true
 ): BitNode => {
   const walk = (node: BitNode, depth: number) => {
-    if (!node || isEmpty(node)) return node;
+    if (!node || isLeaf(node)) return node;
     if (depth > maxDepth && cond(node)) return { count: node.count };
     return makeNode(walk(node.zero, depth + 1), walk(node.one, depth + 1));
   };
@@ -83,7 +87,7 @@ export const truncate = (node: BitNode, maxDepth: number): BitNode =>
 
 export const complement = (node: BitNode): BitNode => {
   if (!node) return { count: 1 };
-  if (isEmpty(node)) return;
+  if (isLeaf(node)) return;
   return makeNode(complement(node.zero), complement(node.one));
 };
 
@@ -91,8 +95,8 @@ export const union = (na: BitNode, nb: BitNode): BitNode => {
   if (!na) return nb;
   if (!nb) return na;
 
-  if (isEmpty(na)) return na;
-  if (isEmpty(nb)) return nb;
+  if (isLeaf(na)) return na;
+  if (isLeaf(nb)) return nb;
 
   return makeNode(union(na.zero, nb.zero), union(na.one, nb.one));
 };

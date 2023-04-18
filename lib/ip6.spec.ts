@@ -81,6 +81,7 @@ describe("ip6ToBits / bitsToIp6", () => {
 describe("negative", () => {
   it(`should fail on bad hex`, () => {
     expect(() => ip6ToBits("gggg::")).toThrow(/bad hex/i);
+    expect(() => ip6ToBits("00000::")).toThrow(/bad hex/i);
   });
 
   it(`should fail if the address is the wrong length`, () => {

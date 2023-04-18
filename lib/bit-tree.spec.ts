@@ -156,6 +156,14 @@ describe("BitNode", () => {
       );
   });
 
+  describe("isBitNode", () => {
+    it(`should know a BitNode`, () => {
+      expect(bt.isBitNode(null)).toBeFalsy();
+      expect(bt.isBitNode(undefined)).toBeTruthy();
+      expect(bt.isBitNode({ count: 0 })).toBeTruthy();
+    });
+  });
+
   describe("negative", () => {
     expect(() => bt.build([[2]])).toThrow(/bad/i);
   });
