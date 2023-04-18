@@ -1,8 +1,7 @@
+import { ToBits, BitsTo } from "./types";
+
 const badAddress = (addr: string) =>
   new Error(`Badly formed ip4 address: ${addr}`);
-
-export type ToBits = (addr: string) => number[];
-export type BitsTo = (bits: number[]) => string;
 
 export const ip4ToBits: ToBits = addr => {
   const parts = addr.split(".");
