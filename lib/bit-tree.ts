@@ -19,12 +19,10 @@ const pruneNode = (node: BitNode): BitNode =>
   isRedundant(node) ? { count: node.count } : node;
 
 const makeNode = (zero: BitNode, one: BitNode): BitNode => {
-  if (zero && one)
-    return pruneNode({
-      zero,
-      one,
-      count: zero.count + one.count,
-    });
+  if (zero && one) {
+    const count = zero.count + one.count;
+    return pruneNode({ zero, one, count });
+  }
 
   if (zero) return { zero, count: zero.count };
   if (one) return { one, count: one.count };
