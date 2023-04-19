@@ -46,6 +46,7 @@ export const insert = (node: BitNode, bits: number[]): BitNode => {
   const [head, ...tail] = bits;
   const bit = bitName[head];
   if (!bit) throw new Error(`Bad bit: ${head}`);
+
   return pruneNode({
     ...next,
     [bit]: insert(next[bit], tail),

@@ -1,18 +1,35 @@
+import { ip4ToBits } from "./ip4";
 import { ToBits, BitsTo } from "./types";
+
+const parseRadix = (radix: number) => (n: string) => parseInt(n, radix);
+
+const hexWords = (words: number[]) =>
+  words.map(word => word.toString(16)).join(":");
+
+const last = (nums: number[]): number => nums[nums.length - 1] || 0;
 
 const parseParts = (part: string): number[] => {
   if (part === "") return [];
   const words = part.split(":");
   if (!words.every(word => /^[0-9a-f]{1,4}$/i.test(word)))
     throw new Error(`Bad hex in ${part}`);
-  return words.map(word => parseInt(word, 16));
+  return words.map(parseRadix(16));
 };
 
 const zeros = (length: number): number[] =>
   Array.from({ length }).fill(0) as number[];
 
+const v4suffix = (addr: string): string => {
+  const m = addr.match(/^(.+):(\d+\.\d+\.\d+\.\d+)$/);
+  if (!m) return addr;
+  const words = hexWords(
+    ip4ToBits(m[2]).join("").match(/.{16}/g).map(parseRadix(2))
+  );
+  return [m[1], words].join(":");
+};
+
 const padParts = (addr: string): number[] => {
-  const segs = addr.split("::");
+  const segs = v4suffix(addr).split("::");
   if (segs.length > 2) throw new Error(`Illegal multiple "::" in ${addr}`);
 
   if (segs.length === 1) return parseParts(segs[0]);
@@ -37,11 +54,6 @@ export const ip6ToBits: ToBits = addr => {
     .map(Number);
 };
 
-const hexWords = (words: number[]) =>
-  words.map(word => word.toString(16)).join(":");
-
-const last = (nums: number[]): number => nums[nums.length - 1] || 0;
-
 export const bitsToIp6: BitsTo = bits => {
   if (bits.length > 128 || bits.some(bit => bit < 0 || bit > 1))
     throw new Error(`Bad bit list`);
@@ -50,9 +62,9 @@ export const bitsToIp6: BitsTo = bits => {
     .join("")
     .padEnd(128, "0")
     .match(/.{16}/g)
-    .map(n => parseInt(n, 2));
+    .map(parseRadix(2));
 
-  // Track the length of runs. If word is 0 it's run
+  // Track the length of runs. If word is 0 its run
   // length is the run length of its predecessor + 1.
   // If it's non-zero its run length is 0.
   const tally = (a: number[], b: number) => [...a, b === 0 ? last(a) + 1 : 0];
